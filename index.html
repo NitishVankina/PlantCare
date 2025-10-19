@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlantCare - Your Garden Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: #e2e8f0;
+            color: #4a5568;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab-btn:hover {
+            background: #cbd5e0;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .plants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .plant-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .plant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .plant-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .plant-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .plant-species {
+            color: #718096;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .plant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            background: #f7fafc;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-good {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-soon {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .status-overdue {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .difficulty-easy {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .difficulty-medium {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .difficulty-hard {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #fc8181;
+            color: white;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .btn-danger:hover {
+            background: #f56565;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .input-error {
+            border-color: #f56565 !important;
+            box-shadow: 0 0 0 3px rgba(245,101,101,0.12);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 1.2em;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .plants-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .detail-view {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-icon {
+            font-size: 4em;
+        }
+
+        .detail-title {
+            flex: 1;
+        }
+
+        .detail-title h2 {
+            font-size: 2em;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .care-section {
+            margin-bottom: 25px;
+        }
+
+        .care-section h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .care-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .care-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .care-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .notes-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 10px;
+        }
+
+        .notes-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .notes-content {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        /* Toast variant styles */
+        #toast.toast-info { background: #ebf8ff; color: #2c5282; border: 1px solid #bee3f8; }
+        #toast.toast-warning { background: #fffaf0; color: #744210; border: 1px solid #fbd38d; }
+        #toast.toast-success { background: #f0fff4; color: #22543d; border: 1px solid #a7f3d0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌱 PlantCare</h1>
+            <p class="subtitle">Your personal garden manager</p>
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+                <button class="tab-btn" onclick="switchTab('library')">Plant Library</button>
+                <button class="tab-btn" onclick="switchTab('mygarden')">My Garden</button>
+            </div>
+            
+            <div style="margin-top:12px; display:flex; justify-content:center;">
+                <input id="globalSearch" type="search" placeholder="Search plants or your garden..." style="width:60%; padding:10px; border-radius:10px; border:2px solid #e2e8f0; font-size:1em;" oninput="debouncedSearch(event)">
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPlants">0</div>
+                    <div class="stat-label">Total Plants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="needWater">0</div>
+                    <div class="stat-label">Need Water</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="healthyPlants">0</div>
+                    <div class="stat-label">Healthy</div>
+                </div>
+            </div>
+
+            <div class="detail-view">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">🚨 Needs Attention</h2>
+                <div id="attentionList" class="plants-grid"></div>
+            </div>
+        </div>
+
+        <!-- Plant Library Section -->
+        <div id="library" class="content-section">
+            <div class="plants-grid" id="libraryGrid"></div>
+        </div>
+
+        <!-- My Garden Section -->
+        <div id="mygarden" class="content-section">
+            <div id="myGardenGrid" class="plants-grid"></div>
+            <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="exportGarden()">Export Garden</button>
+                <button class="btn btn-secondary" onclick="triggerImport()">Import Garden</button>
+                <button class="btn btn-secondary" onclick="openImportModal()">Paste JSON</button>
+                <input id="importFileInput" type="file" accept=".json,application/json" style="display:none" onchange="importGardenFile(event)">
+            </div>
+            <div style="margin-top:12px; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;">
+                <button id="notifyToggle" class="btn btn-secondary" onclick="toggleNotifications()">Enable Notifications</button>
+                <div id="notifyStatus" style="color:#718096; font-size:0.95em;">Notifications are off</div>
+                <label style="color:#718096; margin-left:6px;">Frequency:</label>
+                <select id="notifyFrequency" style="padding:8px; border-radius:8px; border:2px solid #e2e8f0;">
+                    <option value="15">15 min</option>
+                    <option value="30" selected>30 min</option>
+                    <option value="60">1 hour</option>
+                    <option value="360">6 hours</option>
+                    <option value="1440">24 hours</option>
+                </select>
+                <button class="btn btn-primary" style="width:auto; padding:10px 14px;" onclick="testNotification()">Test Notification</button>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;">
+                <label style="color:#718096;">Message:</label>
+                <input id="notifyTemplate" placeholder="{{nickname}} needs water ({{daysUntilWater}} days)" style="padding:8px; border-radius:8px; border:2px solid #e2e8f0; width:50%;">
+                <label style="color:#718096;">Type:</label>
+                <select id="notifyType" style="padding:8px; border-radius:8px; border:2px solid #e2e8f0;">
+                    <option value="info">Info</option>
+                    <option value="warning">Warning</option>
+                    <option value="success">Success</option>
+                </select>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;">
+                <label style="color:#718096;">Push (requires server to send)</label>
+                <input id="vapidKey" placeholder="VAPID public key (base64)" style="padding:8px; border-radius:8px; border:2px solid #e2e8f0; width:40%;">
+                <button id="pushSubscribeBtn" class="btn btn-primary" onclick="subscribeToPush()">Subscribe to Push</button>
+                <button id="pushUnsubscribeBtn" class="btn btn-secondary" onclick="unsubscribePush()">Unsubscribe Push</button>
+                <button id="copySubBtn" class="btn btn-secondary" onclick="copySubscriptionToClipboard()">Copy Subscription</button>
+            </div>
+            <div id="toast" style="position:fixed; right:20px; bottom:20px; z-index:2000; display:none;
+                        min-width:220px; max-width:320px; background:white; padding:12px 16px; border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.12); cursor:pointer;">
+                <div id="toastMsg" style="color:#2d3748;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Plant Modal -->
+    <div id="addPlantModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Add to Your Garden</div>
+            <div class="form-group">
+                <label>Give it a nickname (optional)</label>
+                <input type="text" id="plantNickname" placeholder="e.g., My Monstera">
+            </div>
+            <div class="form-group">
+                <label>Last watered</label>
+                <input type="date" id="lastWatered">
+            </div>
+            <button class="btn btn-primary" onclick="confirmAddPlant()">Add Plant</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Plant Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- Import Modal (paste JSON) -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Import Garden JSON</div>
+            <div class="form-group">
+                <label>Paste your exported JSON here</label>
+                <textarea id="importJsonText" placeholder='Paste JSON here' style="min-height:160px" oninput="clearImportError()"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Import mode</label>
+                <select id="importMode">
+                    <option value="replace">Replace current garden</option>
+                    <option value="merge">Merge with current garden (dedupe by userPlantId)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Or choose a file to import</label>
+                <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()">Choose file to import</button>
+            </div>
+            <button class="btn btn-primary" onclick="confirmImportFromText()">Import</button>
+            <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+    // Notification settings keys
+    const NOTIFY_TEMPLATE_KEY = 'plantcare_notifications_template';
+    const NOTIFY_TYPE_KEY = 'plantcare_notifications_type';
+    // Plant Library Data (will be loaded from plants.json if available)
+    let plantLibrary = [
+            {
+                id: 1,
+                name: "Monstera Deliciosa",
+                species: "Monstera deliciosa",
+                icon: "🌿",
+                waterDays: 7,
+                fertilizeDays: 30,
+                difficulty: "easy",
+                light: "Bright indirect light",
+                soil: "Well-draining potting mix",
+                tips: "Allow top 2 inches of soil to dry between waterings. Loves humidity."
+            },
+            {
+                id: 2,
+                name: "Snake Plant",
+                species: "Sansevieria trifasciata",
+                icon: "🪴",
+                waterDays: 14,
+                fertilizeDays: 60,
+                difficulty: "easy",
+                light: "Low to bright indirect light",
+                soil: "Cacti/succulent mix",
+                tips: "Very drought tolerant. Water sparingly, especially in winter."
+            },
+            {
+                id: 3,
+                name: "Pothos",
+                species: "Epipremnum aureum",
+                icon: "🍃",
+                waterDays: 7,
+                fertilizeDays: 30,
+                difficulty: "easy",
+                light: "Low to bright indirect light",
+                soil: "General potting soil",
+                tips: "Thrives on neglect. Great for beginners and low-light areas."
+            },
+            {
+                id: 4,
+                name: "Peace Lily",
+                species: "Spathiphyllum",
+                icon: "🌸",
+                waterDays: 5,
+                fertilizeDays: 45,
+                difficulty: "medium",
+                light: "Low to medium indirect light",
+                soil: "Rich, well-draining soil",
+                tips: "Droops dramatically when thirsty. Toxic to pets."
+            },
+            {
+                id: 5,
+                name: "Fiddle Leaf Fig",
+                species: "Ficus lyrata",
+                icon: "🌳",
+                waterDays: 7,
+                fertilizeDays: 30,
+                difficulty: "hard",
+                light: "Bright indirect light",
+                soil: "Well-draining potting mix",
+                tips: "Sensitive to changes. Keep in one spot and rotate weekly."
+            },
+            {
+                id: 6,
+                name: "Spider Plant",
+                species: "Chlorophytum comosum",
+                icon: "🕷️",
+                waterDays: 7,
+                fertilizeDays: 30,
+                difficulty: "easy",
+                light: "Bright indirect light",
+                soil: "Well-draining potting mix",
+                tips: "Produces baby plants on runners. Easy to propagate."
+            },
+            {
+                id: 7,
+                name: "Aloe Vera",
+                species: "Aloe barbadensis",
+                icon: "🌵",
+                waterDays: 21,
+                fertilizeDays: 90,
+                difficulty: "easy",
+                light: "Bright direct light",
+                soil: "Cacti/succulent mix",
+                tips: "Succulent that stores water. Don't overwater!"
+            },
+            {
+                id: 8,
+                name: "Boston Fern",
+                species: "Nephrolepis exaltata",
+                icon: "🌾",
+                waterDays: 3,
+                fertilizeDays: 30,
+                difficulty: "medium",
+                light: "Indirect light",
+                soil: "Rich, humid soil",
+                tips: "Loves humidity. Mist regularly and keep soil moist."
+            }
+        ];
+
+    // User's garden (stored in memory)
+    let myGarden = [];
+        let selectedPlant = null;
+
+        // Initialize app
+        // Load plant library from external JSON if available
+        async function loadPlantLibrary() {
+            // If page is opened via file:// the fetch API cannot load local files in many browsers.
+            if (location.protocol === 'file:') {
+                try {
+                    const existing = document.getElementById('fileProtocolWarning');
+                    if (!existing) {
+                        document.body.insertAdjacentHTML('afterbegin', `
+                            <div id="fileProtocolWarning" style="background:#fff3cd;color:#664d03;padding:12px 16px;border:1px solid #ffeeba;border-radius:6px;margin:12px;max-width:1200px;margin-left:auto;margin-right:auto;text-align:center;">
+                                ⚠️ This page was opened with the file:// protocol. Browsers often block fetch() for local files — to load <strong>plants.json</strong> please serve this folder over HTTP (for example: <code>python -m http.server</code> or use VS Code Live Server).
+                            </div>
+                        `);
+                    }
+                } catch (e) { /* ignore DOM insertion errors */ }
+            }
+
+            // Build a document-relative URL. This works on GitHub Pages where the site may be hosted under
+            // a user/repo path (e.g. https://username.github.io/repo/). Using new URL('plants.json', location.href)
+            // ensures the JSON is requested from the same directory as the current document.
+            const docRelative = (() => {
+                try {
+                    return new URL('plants.json', location.href).href;
+                } catch (e) { return 'plants.json'; }
+            })();
+
+            const candidates = [docRelative, '/plants.json', 'plants.json'];
+
+            for (const url of candidates) {
+                try {
+                    const resp = await fetch(url, { cache: 'no-store' });
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    const data = await resp.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        plantLibrary = data;
+                        console.info('Loaded plant library from', url, '(', plantLibrary.length, 'items)');
+                        const warn = document.getElementById('fileProtocolWarning');
+                        if (warn) warn.remove();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('Could not load', url, e);
+                }
+            }
+
+            // All attempts failed — keep embedded fallback
+            console.warn('Using embedded plantLibrary fallback (bundled)');
+        }
+
+        // Load garden from localStorage
+        function loadGardenFromStorage() {
+            try {
+                const raw = localStorage.getItem('plantcare_myGarden');
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                // Parse dates and ensure structure
+                myGarden = parsed.map(p => ({
+                    ...p,
+                    lastWatered: p.lastWatered ? new Date(p.lastWatered) : new Date(),
+                }));
+            } catch (e) {
+                console.error('Failed to load garden from storage', e);
+            }
+        }
+
+        // Save garden to localStorage (serialize dates)
+        function saveGardenToStorage() {
+            try {
+                const serialized = myGarden.map(p => ({
+                    ...p,
+                    lastWatered: p.lastWatered ? new Date(p.lastWatered).toISOString() : null,
+                }));
+                localStorage.setItem('plantcare_myGarden', JSON.stringify(serialized));
+            } catch (e) {
+                console.error('Failed to save garden to storage', e);
+            }
+        }
+
+        async function init() {
+            await loadPlantLibrary();
+            renderLibrary();
+            // Load saved garden if present
+            loadGardenFromStorage();
+            // Load notification template/type settings
+            loadNotificationSettings();
+            updateDashboard();
+            updateMyGarden();
+            
+            // Set today's date as default
+            document.getElementById('lastWatered').valueAsDate = new Date();
+        }
+
+        // Switch between tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Render plant library
+        function renderLibrary() {
+            const grid = document.getElementById('libraryGrid');
+            const list = arguments[0] && Array.isArray(arguments[0]) ? arguments[0] : plantLibrary;
+            grid.innerHTML = list.map(plant => `
+                <div class="plant-card" onclick="showAddModal(${plant.id})">
+                    <div class="plant-icon">${plant.icon}</div>
+                    <div class="plant-name">${plant.name}</div>
+                    <div class="plant-species">${plant.species}</div>
+                    <div class="plant-info">
+                        <div class="info-item">
+                            <span>💧 Water every</span>
+                            <strong>${plant.waterDays} days</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>🌱 Fertilize every</span>
+                            <strong>${plant.fertilizeDays} days</strong>
+                        </div>
+                    </div>
+                    <span class="difficulty difficulty-${plant.difficulty}">
+                        ${plant.difficulty.toUpperCase()}
+                    </span>
+                    <button class="btn btn-primary" onclick="event.stopPropagation(); showAddModal(${plant.id})">
+                        Add to Garden
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Show add plant modal
+        function showAddModal(plantId) {
+            selectedPlant = plantLibrary.find(p => p.id === plantId);
+            document.getElementById('addPlantModal').classList.add('active');
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('addPlantModal').classList.remove('active');
+            document.getElementById('detailModal').classList.remove('active');
+            document.getElementById('plantNickname').value = '';
+        }
+
+        // Confirm add plant
+        function confirmAddPlant() {
+            const nickname = document.getElementById('plantNickname').value;
+            const lastWatered = document.getElementById('lastWatered').value;
+            
+            const newPlant = {
+                ...selectedPlant,
+                userPlantId: Date.now(),
+                nickname: nickname || selectedPlant.name,
+                lastWatered: new Date(lastWatered),
+                notes: ""
+            };
+            
+            myGarden.push(newPlant);
+            closeModal();
+            saveGardenToStorage();
+            updateDashboard();
+            updateMyGarden();
+        }
+
+        // Calculate days until next watering
+        function getDaysUntilWater(plant) {
+            const lastWatered = new Date(plant.lastWatered);
+            const nextWater = new Date(lastWatered);
+            nextWater.setDate(nextWater.getDate() + plant.waterDays);
+            
+            const today = new Date();
+            const diffTime = nextWater - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            return diffDays;
+        }
+
+        // Get watering status
+        function getWaterStatus(plant) {
+            const days = getDaysUntilWater(plant);
+            if (days < 0) return { class: 'status-overdue', text: `${Math.abs(days)} days overdue!` };
+            if (days === 0) return { class: 'status-overdue', text: 'Water today!' };
+            if (days <= 2) return { class: 'status-soon', text: `Water in ${days} days` };
+            return { class: 'status-good', text: `Water in ${days} days` };
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('totalPlants').textContent = myGarden.length;
+            
+            const needWater = myGarden.filter(p => getDaysUntilWater(p) <= 2).length;
+            document.getElementById('needWater').textContent = needWater;
+            
+            const healthy = myGarden.filter(p => getDaysUntilWater(p) > 2).length;
+            document.getElementById('healthyPlants').textContent = healthy;
+            
+            // Show plants needing attention
+            const attentionPlants = myGarden.filter(p => getDaysUntilWater(p) <= 2);
+            const attentionList = document.getElementById('attentionList');
+            
+            if (attentionPlants.length === 0) {
+                attentionList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✨</div><div class="empty-state-text">All plants are happy and healthy!</div></div>';
+            } else {
+                attentionList.innerHTML = attentionPlants.map(plant => renderPlantCard(plant)).join('');
+            }
+        }
+
+        // Render plant card
+        function renderPlantCard(plant) {
+            const status = getWaterStatus(plant);
+            return `
+                <div class="plant-card">
+                    <div class="plant-icon">${plant.icon}</div>
+                    <div class="plant-name">${plant.nickname}</div>
+                    <div class="plant-species">${plant.species}</div>
+                    <span class="status-badge ${status.class}">${status.text}</span>
+                    <div class="plant-info">
+                        <div class="info-item">
+                            <span>💧 Last watered</span>
+                            <strong>${formatDate(plant.lastWatered)}</strong>
+                        </div>
+                        <div class="info-item">
+                            <span>📅 Schedule</span>
+                            <strong>Every ${plant.waterDays} days</strong>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="waterPlant(${plant.userPlantId})">
+                        💧 Water Now
+                    </button>
+                    <button class="btn btn-secondary" onclick="showPlantDetail(${plant.userPlantId})">
+                        View Details
+                    </button>
+                    <button class="btn btn-danger" onclick="removePlant(${plant.userPlantId})">
+                        Remove Plant
+                    </button>
+                </div>
+            `;
+        }
+
+        // Update my garden
+        function updateMyGarden() {
+            const grid = document.getElementById('myGardenGrid');
+            const list = arguments[0] && Array.isArray(arguments[0]) ? arguments[0] : myGarden;
+
+            if (list.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌱</div><div class="empty-state-text">Your garden is empty. Add some plants from the library!</div></div>';
+            } else {
+                grid.innerHTML = list.map(plant => renderPlantCard(plant)).join('');
+            }
+        }
+
+        // Debounce helper
+        function debounce(fn, wait) {
+            let t;
+            return function() {
+                const args = arguments;
+                clearTimeout(t);
+                t = setTimeout(() => fn.apply(this, args), wait);
+            };
+        }
+
+        // Search handling
+        const debouncedSearch = debounce(handleSearch, 250);
+
+        function handleSearch(e) {
+            const q = (e && e.target ? e.target.value : (document.getElementById('globalSearch') && document.getElementById('globalSearch').value)) || '';
+            const ql = q.trim().toLowerCase();
+
+            if (!ql) {
+                renderLibrary();
+                updateMyGarden();
+                return;
+            }
+
+            // filter library by name or species
+            const libFiltered = plantLibrary.filter(p => (p.name && p.name.toLowerCase().includes(ql)) || (p.species && p.species.toLowerCase().includes(ql)));
+            renderLibrary(libFiltered);
+
+            // filter my garden by nickname, name, or species
+            const gardenFiltered = myGarden.filter(p => {
+                const nickname = p.nickname ? p.nickname.toLowerCase() : '';
+                const name = p.name ? p.name.toLowerCase() : '';
+                const species = p.species ? p.species.toLowerCase() : '';
+                return nickname.includes(ql) || name.includes(ql) || species.includes(ql);
+            });
+            updateMyGarden(gardenFiltered);
+        }
+
+        // Water plant
+        function waterPlant(userPlantId) {
+            const plant = myGarden.find(p => p.userPlantId === userPlantId);
+            if (plant) {
+                plant.lastWatered = new Date();
+                saveGardenToStorage();
+                updateDashboard();
+                updateMyGarden();
+            }
+        }
+
+        // Remove plant
+        function removePlant(userPlantId) {
+            if (confirm('Are you sure you want to remove this plant?')) {
+                myGarden = myGarden.filter(p => p.userPlantId !== userPlantId);
+                saveGardenToStorage();
+                updateDashboard();
+                updateMyGarden();
+            }
+        }
+
+        // Show plant detail
+        function showPlantDetail(userPlantId) {
+            const plant = myGarden.find(p => p.userPlantId === userPlantId);
+            if (!plant) return;
+            
+            const status = getWaterStatus(plant);
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            
+            content.innerHTML = `
+                <div class="detail-header">
+                    <div class="detail-icon">${plant.icon}</div>
+                    <div class="detail-title">
+                        <h2>${plant.nickname}</h2>
+                        <div class="plant-species">${plant.species}</div>
+                        <span class="difficulty difficulty-${plant.difficulty}">${plant.difficulty.toUpperCase()}</span>
+                    </div>
+                </div>
+                
+                <div class="care-section">
+                    <h3>💧 Watering Status</h3>
+                    <span class="status-badge ${status.class}">${status.text}</span>
+                    <div class="care-grid">
+                        <div class="care-item">
+                            <strong>Last Watered</strong>
+                            ${formatDate(plant.lastWatered)}
+                        </div>
+                        <div class="care-item">
+                            <strong>Schedule</strong>
+                            Every ${plant.waterDays} days
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="care-section">
+                    <h3>🌱 Care Requirements</h3>
+                    <div class="care-grid">
+                        <div class="care-item">
+                            <strong>☀️ Light</strong>
+                            ${plant.light}
+                        </div>
+                        <div class="care-item">
+                            <strong>🌍 Soil</strong>
+                            ${plant.soil}
+                        </div>
+                        <div class="care-item">
+                            <strong>🧪 Fertilize</strong>
+                            Every ${plant.fertilizeDays} days
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="care-section">
+                    <h3>💡 Care Tips</h3>
+                    <div class="care-item">
+                        ${plant.tips}
+                    </div>
+                </div>
+                
+                <div class="notes-section">
+                    <h3>📝 Personal Notes</h3>
+                    <textarea id="plantNotes" class="form-group" placeholder="Add your observations, care history, etc...">${plant.notes}</textarea>
+                    <button class="btn btn-primary" onclick="saveNotes(${plant.userPlantId})">Save Notes</button>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            `;
+            
+            modal.classList.add('active');
+        }
+
+        // Save notes
+        function saveNotes(userPlantId) {
+            const plant = myGarden.find(p => p.userPlantId === userPlantId);
+            if (plant) {
+                plant.notes = document.getElementById('plantNotes').value;
+                saveGardenToStorage();
+                alert('Notes saved!');
+            }
+        }
+
+        // Deterministic date formatter (YYYY-MM-DD or 'Mon D, YYYY')
+        function formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            // Use a friendly, consistent format: Mon DD, YYYY (e.g., Oct 19, 2025)
+            const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            const mon = monthNames[d.getMonth()];
+            const day = d.getDate();
+            const year = d.getFullYear();
+            return `${mon} ${day}, ${year}`;
+        }
+
+        // Initialize on load
+        init();
+
+        // Export garden to downloadable JSON file
+        function exportGarden() {
+            try {
+                const serialized = myGarden.map(p => ({
+                    ...p,
+                    lastWatered: p.lastWatered ? new Date(p.lastWatered).toISOString() : null,
+                }));
+                const dataStr = JSON.stringify({ exportedAt: new Date().toISOString(), garden: serialized }, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'plantcare_garden_export_' + new Date().toISOString().slice(0,19).replace(/[:T]/g,'-') + '.json';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                console.error('Export failed', e);
+                alert('Export failed. See console for details.');
+            }
+        }
+
+        // Trigger hidden file input to import
+        function triggerImport() {
+            openImportModal();
+        }
+
+        // Handle file import
+        function importGardenFile(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const raw = evt.target.result;
+                    const parsed = JSON.parse(raw);
+                    const candidate = parsed && parsed.garden ? parsed.garden : parsed;
+                    if (!validateImportedGarden(candidate)) {
+                        alert('Imported file does not look like a valid garden JSON.');
+                        return;
+                    }
+
+                    const mode = document.getElementById('importMode') ? document.getElementById('importMode').value : 'replace';
+                    const parsedItems = candidate.map(p => ({ ...p, lastWatered: p.lastWatered ? new Date(p.lastWatered) : new Date() }));
+
+                    if (mode === 'replace') {
+                        myGarden = parsedItems;
+                    } else {
+                        const existingById = new Map(myGarden.map(p => [p.userPlantId, p]));
+                        for (const item of parsedItems) {
+                            if (!existingById.has(item.userPlantId)) {
+                                existingById.set(item.userPlantId, item);
+                            }
+                        }
+                        myGarden = Array.from(existingById.values());
+                    }
+
+                    saveGardenToStorage();
+                    updateDashboard();
+                    updateMyGarden();
+                    alert('Import successful!');
+                } catch (err) {
+                    console.error('Import failed', err);
+                    alert('Failed to import file. See console for details.');
+                }
+            };
+            reader.readAsText(file);
+            // reset input so same file can be chosen again
+            e.target.value = '';
+        }
+
+        // Open paste-import modal
+        function openImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('importJsonText').value = '';
+        }
+
+        // Confirm import from pasted JSON
+        function confirmImportFromText() {
+            const text = document.getElementById('importJsonText').value;
+            if (!text) {
+                // mark textarea and alert
+                const ta = document.getElementById('importJsonText');
+                ta.classList.add('input-error');
+                alert('Please paste JSON to import.');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(text);
+                const candidate = parsed && parsed.garden ? parsed.garden : parsed;
+                if (!validateImportedGarden(candidate)) {
+                    document.getElementById('importJsonText').classList.add('input-error');
+                    alert('Pasted JSON does not look like a valid garden.');
+                    return;
+                }
+
+                const mode = document.getElementById('importMode') ? document.getElementById('importMode').value : 'replace';
+                const parsedItems = candidate.map(p => ({ ...p, lastWatered: p.lastWatered ? new Date(p.lastWatered) : new Date() }));
+
+                if (mode === 'replace') {
+                    myGarden = parsedItems;
+                } else {
+                    // merge: keep existing and add new ones, dedupe by userPlantId
+                    const existingById = new Map(myGarden.map(p => [p.userPlantId, p]));
+                    for (const item of parsedItems) {
+                        if (!existingById.has(item.userPlantId)) {
+                            existingById.set(item.userPlantId, item);
+                        }
+                    }
+                    myGarden = Array.from(existingById.values());
+                }
+
+                saveGardenToStorage();
+                updateDashboard();
+                updateMyGarden();
+                closeImportModal();
+                alert('Import successful!');
+            } catch (err) {
+                console.error('Failed to parse pasted JSON', err);
+                document.getElementById('importJsonText').classList.add('input-error');
+                alert('Invalid JSON. Please check and try again.');
+            }
+        }
+
+        // Very small validation of imported garden shape
+        function validateImportedGarden(arr) {
+            if (!Array.isArray(arr)) return false;
+            return arr.every(p => p && ('userPlantId' in p) && ('nickname' in p) && ('lastWatered' in p) && ('waterDays' in p));
+        }
+
+        function clearImportError() {
+            const ta = document.getElementById('importJsonText');
+            if (ta && ta.classList.contains('input-error')) ta.classList.remove('input-error');
+        }
+
+        // --- Notifications ---
+        let notificationsEnabled = false;
+    let notificationIntervalId = null;
+        const NOTIFY_KEY = 'plantcare_notifications_last'; // stores map of userPlantId -> timestamp
+    const NOTIFY_FREQ_KEY = 'plantcare_notifications_freq';
+
+        // Load persisted template/type
+        function loadNotificationSettings() {
+            try {
+                const tpl = localStorage.getItem(NOTIFY_TEMPLATE_KEY) || '{{nickname}} needs water';
+                const type = localStorage.getItem(NOTIFY_TYPE_KEY) || 'warning';
+                const input = document.getElementById('notifyTemplate');
+                const sel = document.getElementById('notifyType');
+                if (input) input.value = tpl;
+                if (sel) sel.value = type;
+            } catch (e) { }
+        }
+
+        function saveNotificationSettings() {
+            try {
+                const tpl = (document.getElementById('notifyTemplate') || {}).value || '';
+                const type = (document.getElementById('notifyType') || {}).value || 'warning';
+                localStorage.setItem(NOTIFY_TEMPLATE_KEY, tpl);
+                localStorage.setItem(NOTIFY_TYPE_KEY, type);
+            } catch (e) {}
+        }
+
+        // simple Mustache-like template renderer for a couple placeholders
+        function renderTemplate(template, plant) {
+            if (!template) return `${plant.nickname} needs water`;
+            const days = getDaysUntilWater(plant);
+            return template.replace(/{{\s*nickname\s*}}/gi, plant.nickname || '')
+                           .replace(/{{\s*name\s*}}/gi, plant.name || '')
+                           .replace(/{{\s*species\s*}}/gi, plant.species || '')
+                           .replace(/{{\s*daysUntilWater\s*}}/gi, String(days))
+                           .replace(/{{\s*daysUntilWaterAbs\s*}}/gi, String(Math.abs(days)));
+        }
+
+        function toggleNotifications() {
+            if (!notificationsEnabled) {
+                requestNotificationPermission().then(granted => {
+                    if (granted) startNotificationLoop();
+                });
+            } else {
+                stopNotificationLoop();
+            }
+        }
+
+        function requestNotificationPermission() {
+            return new Promise(resolve => {
+                if (!('Notification' in window)) {
+                    alert('This browser does not support system notifications; will use in-app toasts instead.');
+                    notificationsEnabled = true;
+                    document.getElementById('notifyToggle').textContent = 'Disable Notifications';
+                    document.getElementById('notifyStatus').textContent = 'Using in-app toasts';
+                    resolve(true);
+                    return;
+                }
+
+                if (Notification.permission === 'granted') {
+                    notificationsEnabled = true;
+                    document.getElementById('notifyToggle').textContent = 'Disable Notifications';
+                    document.getElementById('notifyStatus').textContent = 'Notifications enabled';
+                    resolve(true);
+                    return;
+                }
+
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        notificationsEnabled = true;
+                        document.getElementById('notifyToggle').textContent = 'Disable Notifications';
+                        document.getElementById('notifyStatus').textContent = 'Notifications enabled';
+                        resolve(true);
+                    } else {
+                        alert('Notifications blocked or denied. Using in-app toasts instead.');
+                        notificationsEnabled = true;
+                        document.getElementById('notifyToggle').textContent = 'Disable Notifications';
+                        document.getElementById('notifyStatus').textContent = 'Using in-app toasts';
+                        resolve(true);
+                    }
+                });
+            });
+        }
+
+        function startNotificationLoop() {
+            if (notificationIntervalId) clearInterval(notificationIntervalId);
+            // read frequency (minutes) from select or storage
+            const stored = parseInt(localStorage.getItem(NOTIFY_FREQ_KEY), 10) || 30;
+            const sel = document.getElementById('notifyFrequency');
+            if (sel) sel.value = stored.toString();
+            const freqMinutes = parseInt(sel ? sel.value : stored, 10) || stored;
+            checkAndNotify();
+            notificationIntervalId = setInterval(checkAndNotify, freqMinutes * 60 * 1000);
+            document.getElementById('notifyToggle').textContent = 'Disable Notifications';
+            document.getElementById('notifyStatus').textContent = 'Notifications enabled';
+        }
+
+        function stopNotificationLoop() {
+            if (notificationIntervalId) clearInterval(notificationIntervalId);
+            notificationIntervalId = null;
+            notificationsEnabled = false;
+            document.getElementById('notifyToggle').textContent = 'Enable Notifications';
+            document.getElementById('notifyStatus').textContent = 'Notifications are off';
+        }
+
+        function loadLastNotified() {
+            try {
+                const raw = localStorage.getItem(NOTIFY_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) { return {}; }
+        }
+
+        function saveLastNotified(map) {
+            try { localStorage.setItem(NOTIFY_KEY, JSON.stringify(map)); } catch (e) {}
+        }
+
+        function checkAndNotify() {
+            if (!notificationsEnabled) return;
+            const now = Date.now();
+            const lastMap = loadLastNotified();
+            const toNotify = [];
+
+            myGarden.forEach(p => {
+                const days = getDaysUntilWater(p);
+                if (days <= 0) {
+                    const last = lastMap[p.userPlantId] || 0;
+                    // notify at most once per 24 hours per plant
+                    if (now - last > 24 * 60 * 60 * 1000) {
+                        toNotify.push(p);
+                        lastMap[p.userPlantId] = now;
+                    }
+                }
+            });
+
+            if (toNotify.length > 0) {
+                toNotify.forEach(p => sendNotification(p));
+                saveLastNotified(lastMap);
+            }
+        }
+
+        function sendNotification(plant) {
+            // build content from user template and type
+            const tpl = (document.getElementById('notifyTemplate') || {}).value || localStorage.getItem(NOTIFY_TEMPLATE_KEY) || '{{nickname}} needs water';
+            const type = (document.getElementById('notifyType') || {}).value || localStorage.getItem(NOTIFY_TYPE_KEY) || 'warning';
+            const rendered = renderTemplate(tpl, plant);
+            const title = plant.nickname || plant.name || 'Plant Alert';
+            const body = rendered;
+
+            saveNotificationSettings(); // persist latest
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    const n = new Notification(title, { body, icon: undefined });
+                    n.onclick = () => {
+                        window.focus();
+                        try { showPlantDetail(plant.userPlantId); } catch (e) {}
+                    };
+                } catch (e) {
+                    // fallback to toast
+                    showToast(body, plant.userPlantId, type);
+                }
+            } else {
+                showToast(body, plant.userPlantId, type);
+            }
+        }
+
+        let toastTimer = null;
+        function showToast(msg, userPlantId, type) {
+            const toast = document.getElementById('toast');
+            const msgDiv = document.getElementById('toastMsg');
+            const iconMap = { info: 'ℹ️', warning: '⚠️', success: '✅' };
+            const clsMap = { info: 'toast-info', warning: 'toast-warning', success: 'toast-success' };
+
+            // clear previous type classes
+            toast.classList.remove('toast-info', 'toast-warning', 'toast-success');
+            const applied = clsMap[type] || clsMap['info'];
+            toast.classList.add(applied);
+
+            msgDiv.textContent = `${iconMap[type] || ''} ${msg}`;
+            toast.style.display = 'block';
+            toast.onclick = () => {
+                toast.style.display = 'none';
+                if (userPlantId) showPlantDetail(userPlantId);
+                else {
+                    const overdue = myGarden.find(p => getDaysUntilWater(p) <= 0);
+                    if (overdue) showPlantDetail(overdue.userPlantId);
+                }
+            };
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 6000);
+        }
+
+        // Test notification
+        function testNotification() {
+            // create a dummy test; prefer to use first plant if exists
+            const p = myGarden[0] || { nickname: 'Test Plant', userPlantId: 'test' };
+            sendNotification(p);
+        }
+
+        // Persist frequency when changed
+        const freqSelect = document.getElementById('notifyFrequency');
+        if (freqSelect) {
+            freqSelect.addEventListener('change', (e) => {
+                const v = e.target.value;
+                localStorage.setItem(NOTIFY_FREQ_KEY, v);
+                if (notificationsEnabled) startNotificationLoop();
+            });
+        }
+
+        // --- Push subscription (Service Worker) ---
+        let pushSubscription = null;
+
+        async function registerServiceWorker() {
+            if (!('serviceWorker' in navigator)) return null;
+            try {
+                const reg = await navigator.serviceWorker.register('/sw.js');
+                return reg;
+            } catch (e) { console.warn('SW registration failed', e); return null; }
+        }
+
+        async function subscribeToPush() {
+            const vapid = document.getElementById('vapidKey').value.trim();
+            if (!vapid) { alert('Please paste your VAPID public key first.'); return; }
+            const reg = await registerServiceWorker();
+            if (!reg) { alert('Service worker registration failed.'); return; }
+            try {
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapid)
+                });
+                pushSubscription = sub;
+                alert('Push subscribed. You can copy the subscription and send it from your server.');
+            } catch (e) {
+                console.error('Push subscribe error', e);
+                alert('Subscription failed or was denied. See console for details.');
+            }
+        }
+
+        async function unsubscribePush() {
+            try {
+                const reg = await navigator.serviceWorker.getRegistration();
+                if (!reg) return alert('No service worker registered');
+                const sub = await reg.pushManager.getSubscription();
+                if (sub) {
+                    await sub.unsubscribe();
+                    pushSubscription = null;
+                    alert('Unsubscribed from push.');
+                } else {
+                    alert('No active subscription found.');
+                }
+            } catch (e) { console.error('Unsubscribe failed', e); alert('Failed to unsubscribe.'); }
+        }
+
+        async function copySubscriptionToClipboard() {
+            try {
+                const reg = await navigator.serviceWorker.getRegistration();
+                const sub = await (reg ? reg.pushManager.getSubscription() : null) || pushSubscription;
+                if (!sub) return alert('No subscription available. Subscribe first.');
+                const json = JSON.stringify(sub);
+                await navigator.clipboard.writeText(json);
+                alert('Subscription copied to clipboard. Paste it to your server.');
+            } catch (e) { console.error(e); alert('Failed to copy subscription.'); }
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+    </script>
+</body>
+</html>
