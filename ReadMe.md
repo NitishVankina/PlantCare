@@ -18,11 +18,14 @@ Features
 
 🔧 Open Source: Contribute new features, plants, and translations.
 
+
+# Follow platform-specific build instructions here
+
 Installation
 Option 1: Using GitHub
 git clone https://github.com/NitishVankina/PlantCare.git
 cd PlantCare
-# Follow platform-specific build instructions here
+
 
 Option 2: Browser
 
