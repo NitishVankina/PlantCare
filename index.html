@@ -584,6 +584,22 @@
 
         <!-- My Garden Section -->
         <div id="mygarden" class="content-section">
+            <div style="display:flex; gap:12px; justify-content:center; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
+                <label style="color:#718096;">Filter:</label>
+                <select id="filterDifficulty" style="padding:8px; border-radius:8px; border:2px solid #e2e8f0;">
+                    <option value="all">All difficulties</option>
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                <label style="color:#718096;">Sort by next water:</label>
+                <select id="sortNextWater" style="padding:8px; border-radius:8px; border:2px solid #e2e8f0;">
+                    <option value="asc">Soonest first (asc)</option>
+                    <option value="desc">Furthest first (desc)</option>
+                </select>
+                <button class="btn btn-secondary" onclick="applyGardenFilters()">Apply</button>
+                <button class="btn btn-secondary" onclick="resetGardenFilters()">Reset</button>
+            </div>
             <div id="myGardenGrid" class="plants-grid"></div>
             <div style="margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                 <button class="btn btn-primary" onclick="exportGarden()">Export Garden</button>
@@ -1167,13 +1183,43 @@
         // Update my garden
         function updateMyGarden() {
             const grid = document.getElementById('myGardenGrid');
-            const list = arguments[0] && Array.isArray(arguments[0]) ? arguments[0] : myGarden;
+            // Accept an optional pre-filtered list, otherwise start from myGarden
+            let list = arguments[0] && Array.isArray(arguments[0]) ? arguments[0].slice() : myGarden.slice();
+
+            // Apply UI-selected filters/sorting if present
+            try {
+                const diff = document.getElementById('filterDifficulty') ? document.getElementById('filterDifficulty').value : 'all';
+                const sort = document.getElementById('sortNextWater') ? document.getElementById('sortNextWater').value : 'asc';
+
+                if (diff && diff !== 'all') {
+                    list = list.filter(p => (p.difficulty || '').toLowerCase() === diff.toLowerCase());
+                }
+
+                // compute days until water for sorting (stable)
+                list.sort((a,b) => {
+                    const da = getDaysUntilWater(a);
+                    const db = getDaysUntilWater(b);
+                    return (sort === 'desc') ? (db - da) : (da - db);
+                });
+            } catch (e) {
+                console.warn('Filter/sort error', e);
+            }
 
             if (list.length === 0) {
                 grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🌱</div><div class="empty-state-text">Your garden is empty. Add some plants from the library!</div></div>';
             } else {
                 grid.innerHTML = list.map(plant => renderPlantCard(plant)).join('');
             }
+        }
+
+        // Apply current filters (button handler)
+        function applyGardenFilters() { updateMyGarden(); }
+
+        // Reset filters to defaults
+        function resetGardenFilters() {
+            const fd = document.getElementById('filterDifficulty'); if (fd) fd.value = 'all';
+            const sn = document.getElementById('sortNextWater'); if (sn) sn.value = 'asc';
+            updateMyGarden();
         }
 
         // Debounce helper
